@@ -1,11 +1,7 @@
 <template>
-  <v-app>
-    <v-main>
-      <j-exception/>
-      <notifications group="main"/>
-      <router-view/>
-    </v-main>
-  </v-app>
+  <div id="app" class="app-container">
+    <router-view/>
+  </div>
 </template>
 
 <script>
@@ -15,9 +11,9 @@ export default {
 </script>
 
 <style lang="scss">
-.v-main {
-  .vue-notification-group {
-    margin-top: 5px;
-  }
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures the container is at least the height of the viewport */
 }
 </style>
