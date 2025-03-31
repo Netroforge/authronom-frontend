@@ -11,15 +11,23 @@
       </div>
       <button type="submit">Login</button>
     </form>
-    <button @click="handleLoginWithGoogle" class="google-login-btn">
-      Login via Google
-    </button>
+    <div>
+      <button @click="handleLoginWithGoogle" class="google-login-btn">
+        Login via Google
+      </button>
+    </div>
+    <div>
+      <button @click="handleRegisterWithEmail" class="email-register-btn">
+        Register
+      </button>
+    </div>
     <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
   </div>
 </template>
 
 <script>
 import {loginWithEmailPassword, loginWithGoogle} from "@/services/auth.js";
+import router from "@/router/index.js";
 
 export default {
   data() {
@@ -43,6 +51,13 @@ export default {
       } catch (error) {
         this.errorMessage = error.message;
       }
+    },
+    handleRegisterWithEmail() {
+      try {
+        router.push("/register")
+      } catch (error) {
+        this.errorMessage = error.message;
+      }
     }
   }
 };
@@ -60,6 +75,14 @@ export default {
 
 .google-login-btn {
   background-color: #db4437;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.email-register-btn {
+  background-color: #42db37;
   color: white;
   border: none;
   padding: 10px 20px;

@@ -29,6 +29,40 @@ async function generateCodeChallenge(verifier) {
         .replace(/=+$/, "");
 }
 
+export async function startRegistrationWithEmail(email) {
+    try {
+        const response = await axios.post(`${config.authServer}/public/user/start-registration`, {
+            email
+        });
+        if (response.status === 200) {
+            console.log('Start registration success');
+        } else {
+            throw new Error(response.statusText);
+        }
+    } catch (error) {
+        console.error('Error starting registration:', error);
+        throw {message: 'Something goes wrong'};
+    }
+}
+
+export async function finalizeRegistrationWithEmail(email, confirmationCode, password) {
+    try {
+        const response = await axios.post(`${config.authServer}/public/user/finalize-registration`, {
+            email,
+            confirmationCode,
+            password
+        });
+        if (response.status === 200) {
+            console.log('Finalize registration success');
+        } else {
+            throw new Error(response.statusText);
+        }
+    } catch (error) {
+        console.error('Error finalizing registration:', error);
+        throw {message: 'Something goes wrong'};
+    }
+}
+
 // Login using email and password
 export async function loginWithEmailPassword(email, password) {
     try {
