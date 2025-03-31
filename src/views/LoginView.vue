@@ -32,7 +32,7 @@ export default {
   methods: {
     async handleLoginWithEmailPassword() {
       try {
-        await loginWithEmailPassword();
+        await loginWithEmailPassword(this.email, this.password);
       } catch (error) {
         this.errorMessage = error.message;
       }
