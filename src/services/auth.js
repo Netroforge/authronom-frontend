@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from "@/router/index.js";
 
 const config = {
     clientId: "test-client", // Your client ID
@@ -134,7 +135,7 @@ export async function frontendOAuth2ClientLoginCallback() {
     localStorage.setItem("access_token", response.data.access_token);
     localStorage.setItem("id_token", response.data.id_token);
 
-    window.location.href = "/dashboard";
+    await router.push("/dashboard")
 }
 
 export function logout() {

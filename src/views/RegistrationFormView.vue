@@ -40,7 +40,12 @@
 </template>
 
 <script>
-import {finalizeRegistrationWithEmail, frontendOAuth2ClientLogin, startRegistrationWithEmail} from '@/services/auth.js';
+import {
+  finalizeRegistrationWithEmail,
+  frontendOAuth2ClientLogin,
+  loginWithEmailPassword,
+  startRegistrationWithEmail
+} from '@/services/auth.js';
 
 export default {
   data() {
@@ -69,6 +74,7 @@ export default {
             this.confirmationCode,
             this.password
         );
+        await loginWithEmailPassword(this.email, this.password);
         await frontendOAuth2ClientLogin();
       } catch (error) {
         this.errorMessage = error.message;
