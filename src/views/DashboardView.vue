@@ -1,15 +1,15 @@
 <template>
   <div class="container">
     <h1>Dashboard</h1>
-    <p v-if="user">Welcome, {{ user.name }} ({{ user.email }})</p>
+    <p v-if="user">Welcome back, email: {{ user.email }}</p>
     <button @click="logout">Logout</button>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import {logout, getIdToken} from "@/services/auth.js";
-import { jwtDecode } from "jwt-decode";
+import {onMounted, ref} from "vue";
+import {getIdToken, logout} from "@/services/auth.js";
+import {jwtDecode} from "jwt-decode";
 
 const user = ref(null);
 

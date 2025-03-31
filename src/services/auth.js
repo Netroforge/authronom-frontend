@@ -29,7 +29,39 @@ async function generateCodeChallenge(verifier) {
         .replace(/=+$/, "");
 }
 
-export async function login() {
+// Login using email and password
+export async function loginWithEmailPassword(email, password) {
+    try {
+        const formData = new FormData();
+        formData.append('username', email);
+        formData.append('password', password);
+
+        const response = await axios.post(`${config.authServer}/login`, formData, {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            withCredentials: true // Ensures cookies (like JSESSIONID) are sent and received
+        });
+
+        if (response.status === 200) {
+            // Handle successful authentication
+            console.log('Login successful');
+            // Redirect or update UI as needed
+            await frontendOAuth2ClientLogin()
+        } else {
+            throw new Error(response.statusText);
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        throw {message: 'Invalid email or password'};
+    }
+}
+
+// Login using google
+export async function loginWithGoogle() {
+    window.location.href = `${config.authServer}/oauth2/authorization/google`;
+}
+
+// Frontend client login using OAuth2 with PKCE
+export async function frontendOAuth2ClientLogin() {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = await generateCodeChallenge(codeVerifier);
 
@@ -44,7 +76,7 @@ export async function login() {
     window.location.href = authUrl;
 }
 
-export async function handleCallback() {
+export async function frontendOAuth2ClientLoginCallback() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
 
@@ -62,7 +94,7 @@ export async function handleCallback() {
     });
 
     const response = await axios.post(config.tokenEndpoint, data, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
     });
 
     localStorage.setItem("access_token", response.data.access_token);
