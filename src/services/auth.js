@@ -2,9 +2,9 @@ import router from "@/router/index.js";
 import authronomBackendAxiosInstance from "@/services/axios.js";
 
 const config = {
-    clientId: "test-client", // Your client ID
-    authServer: "http://localhost:8080", // Spring Authorization Server
-    redirectUri: "http://localhost:8081/callback",
+    authServer: import.meta.env.VITE_AUTHRONOM_BACKEND_BASE_URL, // Spring Authorization Server
+    clientId: import.meta.env.VITE_AUTHRONOM_FRONTEND_OAUTH_CLIENT_ID, // Your client ID
+    redirectUri: import.meta.env.VITE_AUTHRONOM_FRONTEND_OAUTH_REDIRECT_URI,
     scope: "openid email profile",
     responseType: "code",
     grantType: "authorization_code",

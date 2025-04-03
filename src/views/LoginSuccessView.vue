@@ -4,11 +4,12 @@
   </div>
 </template>
 
-<script setup>
-import {onMounted} from "vue";
+<script>
 import {frontendOAuth2ClientLogin} from "@/services/auth.js";
 
-onMounted(() => {
-  frontendOAuth2ClientLogin();
-});
+export default {
+  mounted() {
+    frontendOAuth2ClientLogin();
+  }
+}
 </script>
