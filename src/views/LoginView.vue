@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import {loginWithEmailPassword, loginWithGoogle} from "@/services/auth.js";
+import {frontendOAuth2ClientLogin, loginWithEmailPassword, loginWithGoogle} from "@/services/auth.js";
 import router from "@/router/index.js";
 
 export default {
@@ -37,10 +37,12 @@ export default {
       errorMessage: ''
     };
   },
+
   methods: {
     async handleLoginWithEmailPassword() {
       try {
         await loginWithEmailPassword(this.email, this.password);
+        await frontendOAuth2ClientLogin();
       } catch (error) {
         this.errorMessage = error.message;
       }

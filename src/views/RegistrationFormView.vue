@@ -1,7 +1,7 @@
 <template>
   <div class="registration-container">
     <div v-if="step === 1">
-      <h2>Step 1: Enter Your Email and Password</h2>
+      <h2>Enter registration email</h2>
       <form @submit.prevent="startRegistration">
         <div>
           <label for="email">Email: </label>
@@ -12,7 +12,7 @@
     </div>
 
     <div v-if="step === 2">
-      <h2>Step 2: Enter Confirmation Code</h2>
+      <h2>Finalize registration</h2>
       <form @submit.prevent="finalizeRegistration">
         <div>
           <label for="email">Email: </label>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Processing Social Login...</h1>
+    <h1>Processing login...</h1>
   </div>
 </template>
 

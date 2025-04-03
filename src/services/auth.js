@@ -1,5 +1,5 @@
-import axios from "axios";
 import router from "@/router/index.js";
+import authronomBackendAxiosInstance from "@/services/axios.js";
 
 const config = {
     clientId: "test-client", // Your client ID
@@ -8,7 +8,7 @@ const config = {
     scope: "openid email profile",
     responseType: "code",
     grantType: "authorization_code",
-    tokenEndpoint: "http://localhost:8080/oauth2/token",
+    tokenEndpoint: "/oauth2/token",
 };
 
 function generateCodeVerifier() {
@@ -32,35 +32,25 @@ async function generateCodeChallenge(verifier) {
 
 export async function startRegistrationWithEmail(email) {
     try {
-        const response = await axios.post(`${config.authServer}/public/user/start-registration`, {
+        await authronomBackendAxiosInstance.post(`/public/user/start-registration`, {
             email
         });
-        if (response.status === 200) {
-            console.log('Start registration success');
-        } else {
-            throw new Error(response.statusText);
-        }
-    } catch (error) {
-        console.error('Error starting registration:', error);
-        throw {message: 'Something goes wrong'};
+    } catch (e) {
+        const error = e.response?.data?.error || "Internal Server Error, please try again later.";
+        throw {message: error};
     }
 }
 
 export async function finalizeRegistrationWithEmail(email, confirmationCode, password) {
     try {
-        const response = await axios.post(`${config.authServer}/public/user/finalize-registration`, {
+        await authronomBackendAxiosInstance.post(`/public/user/finalize-registration`, {
             email,
             confirmationCode,
             password
         });
-        if (response.status === 200) {
-            console.log('Finalize registration success');
-        } else {
-            throw new Error(response.statusText);
-        }
-    } catch (error) {
-        console.error('Error finalizing registration:', error);
-        throw {message: 'Something goes wrong'};
+    } catch (e) {
+        const error = e.response?.data?.error || "Internal Server Error, please try again later.";
+        throw {message: error};
     }
 }
 
@@ -68,25 +58,16 @@ export async function finalizeRegistrationWithEmail(email, confirmationCode, pas
 export async function loginWithEmailPassword(email, password) {
     try {
         const formData = new FormData();
-        formData.append('username', email);
+        formData.append('email', email);
         formData.append('password', password);
 
-        const response = await axios.post(`${config.authServer}/login`, formData, {
+        await authronomBackendAxiosInstance.post(`/login`, formData, {
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             withCredentials: true // Ensures cookies (like JSESSIONID) are sent and received
         });
-
-        if (response.status === 200) {
-            // Handle successful authentication
-            console.log('Login successful');
-            // Redirect or update UI as needed
-            await frontendOAuth2ClientLogin()
-        } else {
-            throw new Error(response.statusText);
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        throw {message: 'Invalid email or password'};
+    } catch (e) {
+        const error = e.response?.data?.error || "Internal Server Error, please try again later.";
+        throw {message: error};
     }
 }
 
@@ -102,13 +83,11 @@ export async function frontendOAuth2ClientLogin() {
 
     localStorage.setItem("code_verifier", codeVerifier);
 
-    const authUrl = `${config.authServer}/oauth2/authorize?` +
+    window.location.href = `${config.authServer}/oauth2/authorize?` +
         `response_type=${config.responseType}&client_id=${config.clientId}` +
         `&redirect_uri=${encodeURIComponent(config.redirectUri)}` +
         `&scope=${encodeURIComponent(config.scope)}&code_challenge=${codeChallenge}` +
         `&code_challenge_method=S256`;
-
-    window.location.href = authUrl;
 }
 
 export async function frontendOAuth2ClientLoginCallback() {
@@ -128,7 +107,7 @@ export async function frontendOAuth2ClientLoginCallback() {
         code_verifier: codeVerifier,
     });
 
-    const response = await axios.post(config.tokenEndpoint, data, {
+    const response = await authronomBackendAxiosInstance.post(config.tokenEndpoint, data, {
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
     });
 
