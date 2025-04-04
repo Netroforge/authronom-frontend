@@ -2,26 +2,37 @@
   <div class="login-container">
     <form @submit.prevent="handleLoginWithEmailPassword">
       <div>
-        <label for="email">Email: </label>
-        <input type="email" v-model="email" required/>
+        <div class="my-1">
+          <label class="form-label" for="userEmail">Email address</label>
+          <input id="userEmail" v-model="email" aria-label="example@gmail.com" autocomplete="email" class="form-control"
+                 required
+                 type="email">
+        </div>
       </div>
       <div>
-        <label for="password">Password: </label>
-        <input type="password" v-model="password" required/>
+        <div class="my-1">
+          <label class="form-label" for="userPassword">Password</label>
+          <input id="userPassword" v-model="password" aria-describedby="userPasswordHelp"
+                 autocomplete="current-password" class="form-control"
+                 required
+                 type="password">
+          <div id="userPasswordHelp" class="form-text">Must be at least 5 characters with special symbol</div>
+        </div>
       </div>
-      <button type="submit">Login</button>
+      <button class="btn btn-primary w-100 my-1 p-2" type="submit">Login</button>
     </form>
-    <div>
-      <button @click="handleLoginWithGoogle" class="google-login-btn">
-        Login via Google
+    <div class="w-100" style="max-width: 400px;">
+      <button class="google-btn w-100 my-1 p-2" @click="handleLoginWithGoogle">
+        <img alt="Google logo" height="20" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+             width="20">
+        <span>Login with Google</span>
       </button>
-    </div>
-    <div>
-      <button @click="handleRegisterWithEmail" class="email-register-btn">
+
+      <button class="btn email-register-btn w-100 my-1 p-2" @click="handleRegisterWithEmail">
         Register
       </button>
     </div>
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="error my-1 p-2">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -77,12 +88,27 @@ export default {
   color: red;
 }
 
-.google-login-btn {
-  background-color: #db4437;
-  color: white;
-  border: none;
+.google-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 10px 20px;
+  background-color: #ffffff;
+  border: 1px solid #dfdfdf;
+  border-radius: 4px;
+  color: #333333;
+  font-weight: bold;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.google-btn img {
+  width: 30px;
+  margin-right: 10px;
+}
+
+.google-btn:hover {
+  background-color: #f1f1f1;
 }
 
 .email-register-btn {

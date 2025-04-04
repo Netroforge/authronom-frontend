@@ -1,41 +1,55 @@
 <template>
   <div class="registration-container">
     <div v-if="step === 1">
-      <h2>Enter registration email</h2>
+      <h2 class="text-start my-1">Enter registration email</h2>
       <form @submit.prevent="startRegistration">
-        <div>
-          <label for="email">Email: </label>
-          <input type="email" v-model="email" required/>
+        <div class="my-1">
+          <label class="form-label" for="userEmail">Email address</label>
+          <input id="userEmail"
+                 v-model="email"
+                 aria-label="example@gmail.com"
+                 autocomplete="email"
+                 class="form-control"
+                 required
+                 type="email">
         </div>
-        <button type="submit">Next</button>
+        <button class="btn btn-primary w-100 my-1 p-2" type="submit">Next</button>
       </form>
     </div>
 
     <div v-if="step === 2">
       <h2>Finalize registration</h2>
       <form @submit.prevent="finalizeRegistration">
-        <div>
-          <label for="email">Email: </label>
-          <input type="email" v-model="email" required readonly/>
+        <div class="my-1">
+          <label class="form-label" for="userEmail">Email address</label>
+          <input id="userEmail"
+                 v-model="email"
+                 aria-label="example@gmail.com"
+                 autocomplete="email"
+                 class="form-control"
+                 readonly
+                 required
+                 type="email">
         </div>
-        <div>
-          <label for="confirmationCode">Confirmation Code: </label>
-          <input type="text" v-model="confirmationCode" required/>
+        <div class="my-1">
+          <label class="form-label" for="confirmationCode">Confirmation Code</label>
+          <input id="confirmationCode" v-model="confirmationCode" class="form-control" required type="text"/>
         </div>
-        <div>
-          <label for="password">Password: </label>
-          <input type="password" v-model="password" required/>
+        <div class="my-1">
+          <label class="form-label" for="userPassword">Password</label>
+          <input id="userPassword" v-model="password" autocomplete="new-password" class="form-control" required
+                 type="password">
         </div>
-        <button type="submit">Register</button>
+        <button class="btn btn-primary w-100 my-1 p-2" type="submit">Register</button>
       </form>
       <div>
-        <button @click="resendConfirmationCode">
+        <button class="btn btn-secondary w-100 my-1 p-2" @click="resendConfirmationCode">
           Resend confirmation code
         </button>
       </div>
     </div>
 
-    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+    <p v-if="errorMessage" class="error my-1 p-2">{{ errorMessage }}</p>
   </div>
 </template>
 

@@ -1,10 +1,9 @@
 <template>
   <div class="container">
-    <h1>Dashboard</h1>
-    <p v-if="user">Welcome back, email: {{ user.email }}</p>
-    <p v-if="testData">Test data: {{ testData }}</p>
-    <button @click="test">Test</button>
-    <button @click="handleLogout">Logout</button>
+    <h1 class="text-start my-1">Dashboard</h1>
+    <p v-if="user" class="text-start my-1">Welcome back, email: {{ user.email }}</p>
+    <button class="btn btn-primary my-1" @click="test">Test</button>
+    <p v-if="testData" class="text-start my-1">Test data: {{ testData }}</p>
   </div>
 </template>
 
@@ -26,10 +25,6 @@ export default {
   },
 
   methods: {
-    handleLogout() {
-      const authStore = useAuthStore();
-      authStore.logout()
-    },
     async test() {
       try {
         const authStore = useAuthStore();

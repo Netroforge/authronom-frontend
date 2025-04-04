@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Processing login...</h1>
+    <h1 class="text-start my-1">Processing login...</h1>
   </div>
 </template>
 
