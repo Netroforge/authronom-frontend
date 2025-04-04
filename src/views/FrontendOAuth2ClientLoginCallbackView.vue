@@ -5,11 +5,12 @@
 </template>
 
 <script>
-import {frontendOAuth2ClientLoginCallback} from "@/services/auth.js";
+import {useAuthStore} from "@/services/auth.js";
 
 export default {
   mounted() {
-    frontendOAuth2ClientLoginCallback();
+    const authStore = useAuthStore();
+    authStore.frontendOAuth2ClientLoginCallback();
   }
 }
 </script>

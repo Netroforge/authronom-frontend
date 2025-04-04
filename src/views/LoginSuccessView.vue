@@ -5,11 +5,12 @@
 </template>
 
 <script>
-import {frontendOAuth2ClientLogin} from "@/services/auth.js";
+import {useAuthStore} from "@/services/auth.js";
 
 export default {
   mounted() {
-    frontendOAuth2ClientLogin();
+    const authStore = useAuthStore();
+    authStore.frontendOAuth2ClientLogin();
   }
 }
 </script>

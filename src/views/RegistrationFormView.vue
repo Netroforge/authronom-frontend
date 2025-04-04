@@ -40,12 +40,7 @@
 </template>
 
 <script>
-import {
-  finalizeRegistrationWithEmail,
-  frontendOAuth2ClientLogin,
-  loginWithEmailPassword,
-  startRegistrationWithEmail
-} from '@/services/auth.js';
+import {useAuthStore} from '@/services/auth.js';
 
 export default {
   data() {
@@ -60,7 +55,8 @@ export default {
   methods: {
     async startRegistration() {
       try {
-        await startRegistrationWithEmail(this.email);
+        const authStore = useAuthStore();
+        await authStore.startRegistrationWithEmail(this.email);
         // Handle response if needed
         this.step = 2;
       } catch (error) {
@@ -69,20 +65,22 @@ export default {
     },
     async finalizeRegistration() {
       try {
-        await finalizeRegistrationWithEmail(
+        const authStore = useAuthStore();
+        await authStore.finalizeRegistrationWithEmail(
             this.email,
             this.confirmationCode,
             this.password
         );
-        await loginWithEmailPassword(this.email, this.password);
-        await frontendOAuth2ClientLogin();
+        await authStore.loginWithEmailPassword(this.email, this.password);
+        await authStore.frontendOAuth2ClientLogin();
       } catch (error) {
         this.errorMessage = error.message;
       }
     },
     async resendConfirmationCode() {
       try {
-        await startRegistrationWithEmail(this.email);
+        const authStore = useAuthStore();
+        await authStore.startRegistrationWithEmail(this.email);
       } catch (error) {
         this.errorMessage = error.message;
       }
