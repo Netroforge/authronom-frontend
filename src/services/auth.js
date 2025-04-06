@@ -39,6 +39,13 @@ export const useAuthStore = defineStore('auth', {
         error: null,
     }),
     actions: {
+        initialize() {
+            const idToken = localStorage.getItem("id_token");
+            if (idToken) {
+                this.user = jwtDecode(idToken);
+                this.idToken = idToken;
+            }
+        },
         async startRegistrationWithEmail(email) {
             try {
                 await authronomBackendPublicAxiosInstance.post(`/registration/start`, {

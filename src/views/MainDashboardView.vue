@@ -28,11 +28,7 @@ export default {
     async test() {
       try {
         const authStore = useAuthStore();
-        const response = await authronomBackendAuthAxiosInstance.get('/auth/test', {
-          headers: {
-            authorization: `Bearer ${authStore.getIdToken}`
-          }
-        });
+        const response = await authronomBackendAuthAxiosInstance.get('/auth/test', {});
         this.testData = response.data;
       } catch (error) {
         console.error("Error fetching test data:", error);

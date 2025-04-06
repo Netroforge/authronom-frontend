@@ -5,6 +5,7 @@ import FrontendOAuth2ClientLoginCallbackView from "@/views/FrontendOAuth2ClientL
 import MainDashboardView from "@/views/MainDashboardView.vue";
 import LoginSuccessView from "@/views/LoginSuccessView.vue";
 import {useAuthStore} from "@/services/auth.js";
+import UserSettingsView from "@/views/UserSettingsView.vue";
 
 const routes = [
     {path: "/login", name: 'Login', component: LoginView, meta: {requiresAuth: false}},
@@ -14,6 +15,7 @@ const routes = [
 
     // Protected routes
     {path: "/", component: MainDashboardView, meta: {requiresAuth: true}},
+    {path: "/user-settings", component: UserSettingsView, meta: {requiresAuth: true}}
 ];
 
 const router = createRouter({

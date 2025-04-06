@@ -56,7 +56,7 @@ export default {
         await authStore.loginWithEmailPassword(this.email, this.password);
         await authStore.frontendOAuth2ClientLogin();
       } catch (error) {
-        this.errorMessage = error.message;
+        this.errorMessage = error.response?.data?.error;
       }
     },
     handleLoginWithGoogle() {
@@ -64,14 +64,14 @@ export default {
         const authStore = useAuthStore();
         authStore.loginWithGoogle()
       } catch (error) {
-        this.errorMessage = error.message;
+        this.errorMessage = error.response?.data?.error;
       }
     },
     handleRegisterWithEmail() {
       try {
         router.push("/register")
       } catch (error) {
-        this.errorMessage = error.message;
+        this.errorMessage = error.response?.data?.error;
       }
     }
   }

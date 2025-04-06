@@ -1,5 +1,5 @@
 <template>
-  <div class="registration-container">
+  <div class="change-password-container">
     <div v-if="step === 1">
       <h2 class="text-start my-1">Enter registration email</h2>
       <form @submit.prevent="startRegistration">
@@ -74,7 +74,7 @@ export default {
         // Handle response if needed
         this.step = 2;
       } catch (error) {
-        this.errorMessage = error.message;
+        this.errorMessage = error.response?.data?.error;
       }
     },
     async finalizeRegistration() {
@@ -88,7 +88,7 @@ export default {
         await authStore.loginWithEmailPassword(this.email, this.password);
         await authStore.frontendOAuth2ClientLogin();
       } catch (error) {
-        this.errorMessage = error.message;
+        this.errorMessage = error.response?.data?.error;
       }
     },
     async resendConfirmationCode() {
@@ -96,7 +96,7 @@ export default {
         const authStore = useAuthStore();
         await authStore.startRegistrationWithEmail(this.email);
       } catch (error) {
-        this.errorMessage = error.message;
+        this.errorMessage = error.response?.data?.error;
       }
     }
   }
@@ -104,7 +104,7 @@ export default {
 </script>
 
 <style scoped>
-.registration-container {
+.change-password-container {
   max-width: 400px;
   margin: auto;
 }
