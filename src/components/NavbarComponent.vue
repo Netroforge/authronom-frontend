@@ -8,7 +8,7 @@
         <div class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3"></div>
         <div class="dropdown text-end">
           <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            {{ user.email }}
+            {{ user.sub }}
           </button>
           <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#" @click="handleChangePassword">User settings</a></li>
