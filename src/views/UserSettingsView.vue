@@ -1,35 +1,102 @@
 <template>
-  <div v-if="user" class="container d-flex flex-column align-items-center">
+  <div class="container d-flex flex-column align-items-center">
     <h1 class="text-start my-1">User settings</h1>
 
-    <div class="settings-section">
+    <div v-if="user" class="settings-section">
       <h2 class="text-start my-1">Email</h2>
       <div class="current-email-container">
-        <div v-if="!isEditingEmail" class="email-display">
-          <span>{{ user.email }}</span>
-          <button class="btn btn-outline-primary" @click="startEmailEdit">
-            Change
+        <div v-if="emailStep === 1" class="email-display">
+          <div class="my-1">
+            <label class="form-label">Current Email</label>
+            <div class="form-control bg-light">{{ user.email }}</div>
+          </div>
+          <button class="btn btn-primary w-100 my-1 p-2"
+                  type="submit"
+                  @click="initEmailChange">
+            Change email
           </button>
         </div>
-        <form v-else class="email-edit-form" @submit.prevent="changeEmail">
-          <div class="input-group">
-            <input
-                ref="emailInput"
-                v-model="newEmail"
-                class="form-control"
-                required
-                type="email"
-                @blur="cancelEmailEdit"
-            >
-            <button class="btn btn-primary" type="submit">
-              Save
-            </button>
-          </div>
-        </form>
+
+        <div v-else-if="emailStep === 2">
+          <form @submit.prevent="startEmailChange" class="email-edit-form">
+            <div class="my-1">
+              <label class="form-label">Current Email</label>
+              <div class="form-control bg-light">{{ user.email }}</div>
+            </div>
+            <div class="my-1">
+              <label class="form-label" for="newEmail">New Email</label>
+              <input
+                  ref="emailInput"
+                  id="newEmail"
+                  v-model="newEmail"
+                  class="form-control"
+                  type="email"
+                  required
+              >
+            </div>
+            <div class="button-group">
+              <button class="btn btn-primary w-100 my-1 p-2" type="submit">
+                Continue
+              </button>
+              <button class="btn btn-outline-secondary w-100 my-1 p-2" type="button" @click="cancelEmailChange">
+                Cancel
+              </button>
+            </div>
+          </form>
+          <p v-if="emailChangeErrorMessage" class="error my-1 p-2">{{ emailChangeErrorMessage }}</p>
+        </div>
+
+        <div v-else-if="emailStep === 3">
+          <form @submit.prevent="finalizeEmailChange" class="email-confirm-form">
+            <div class="my-1">
+              <label class="form-label">Current Email</label>
+              <div class="form-control bg-light">{{ user.email }}</div>
+            </div>
+            <div class="my-1">
+              <label class="form-label" for="oldEmailConfirmationCode">Confirmation Code (Current Email)</label>
+              <input
+                  id="oldEmailConfirmationCode"
+                  v-model="oldEmailConfirmationCode"
+                  class="form-control"
+                  required
+                  type="text"
+                  autocomplete="one-time-code"
+              />
+            </div>
+            <div class="my-1">
+              <label class="form-label">New Email</label>
+              <div class="form-control bg-light">{{ newEmail }}</div>
+            </div>
+            <div class="my-1">
+              <label class="form-label" for="newEmailConfirmationCode">Confirmation Code (New Email)</label>
+              <input
+                  id="newEmailConfirmationCode"
+                  v-model="newEmailConfirmationCode"
+                  class="form-control"
+                  required
+                  type="text"
+                  autocomplete="one-time-code"
+              />
+            </div>
+            <div class="button-group">
+              <button class="btn btn-primary w-100 my-1 p-2" type="submit">
+                Confirm change
+              </button>
+              <button class="btn btn-outline-primary w-100 my-1 p-2" type="button"
+                      @click="resendEmailChangeConfirmationCodes">
+                Resend confirmation codes
+              </button>
+              <button class="btn btn-outline-secondary w-100 my-1 p-2" type="button" @click="cancelEmailChange">
+                Cancel
+              </button>
+            </div>
+          </form>
+          <p v-if="emailChangeErrorMessage" class="error my-1 p-2">{{ emailChangeErrorMessage }}</p>
+        </div>
       </div>
     </div>
 
-    <div class="settings-section">
+    <div v-if="user" class="settings-section">
       <h2 class="text-start my-1">Password</h2>
       <div v-if="passwordStep === 1">
         <button class="btn btn-primary w-100 my-1 p-2"
@@ -37,6 +104,7 @@
                 @click="startChangePassword">
           Change password
         </button>
+        <p v-if="passwordChangeErrorMessage" class="error my-1 p-2">{{ passwordChangeErrorMessage }}</p>
       </div>
 
       <div v-if="passwordStep === 2">
@@ -75,15 +143,14 @@
             </button>
           </div>
         </form>
+        <p v-if="passwordChangeErrorMessage" class="error my-1 p-2">{{ passwordChangeErrorMessage }}</p>
       </div>
     </div>
-
     <p v-if="errorMessage" class="error my-1 p-2">{{ errorMessage }}</p>
   </div>
 </template>
 
 <script>
-import {useAuthStore} from '@/services/auth';
 import {authronomBackendAuthAxiosInstance} from "@/services/axios.js";
 
 export default {
@@ -91,78 +158,116 @@ export default {
     return {
       user: null,
       newEmail: '',
-      isEditingEmail: false,
+      emailStep: 1,
+      oldEmailConfirmationCode: '',
+      newEmailConfirmationCode: '',
       passwordStep: 1,
       confirmationCode: '',
       newPassword: '',
-      errorMessage: ''
+      errorMessage: '',
+      emailChangeErrorMessage: '',
+      passwordChangeErrorMessage: ''
     };
   },
 
-  mounted() {
-    const authStore = useAuthStore();
-    this.user = authStore.getUser;
+  async mounted() {
+    try {
+      const response = await authronomBackendAuthAxiosInstance.get('/user', {});
+      this.user = response.data;
+    } catch (error) {
+      this.errorMessage = error.response?.data?.error || 'Internal Server Error';
+    }
   },
 
   methods: {
-    startEmailEdit() {
-      this.isEditingEmail = true;
-      this.newEmail = this.user.email;
+    initEmailChange() {
+      this.emailStep = 2;
+      this.newEmail = '';
       this.$nextTick(() => {
         this.$refs.emailInput.focus();
       });
     },
 
-    cancelEmailEdit() {
-      this.isEditingEmail = false;
+    cancelEmailChange() {
+      this.emailStep = 1;
       this.newEmail = '';
+      this.oldEmailConfirmationCode = '';
+      this.newEmailConfirmationCode = '';
+      this.emailChangeErrorMessage = '';
     },
 
-    async changeEmail() {
+    async startEmailChange() {
       try {
-        await authronomBackendAuthAxiosInstance.put('/change-email', {
+        await authronomBackendAuthAxiosInstance.put('/user/change-email/start', {
           newEmail: this.newEmail
         });
-        this.user.email = this.newEmail;
-        this.isEditingEmail = false;
-        this.newEmail = '';
-        this.errorMessage = '';
+        this.emailStep = 3;
+        this.emailChangeErrorMessage = '';
       } catch (error) {
-        this.errorMessage = error.response?.data?.error;
+        this.emailChangeErrorMessage = error.response?.data?.error;
+      }
+    },
+
+    async finalizeEmailChange() {
+      try {
+        await authronomBackendAuthAxiosInstance.put('/user/change-email/finalize', {
+          newEmail: this.newEmail,
+          oldEmailConfirmationCode: this.oldEmailConfirmationCode,
+          newEmailConfirmationCode: this.newEmailConfirmationCode
+        });
+        this.user.email = this.newEmail;
+        this.emailStep = 1;
+        this.newEmail = '';
+        this.oldEmailConfirmationCode = '';
+        this.newEmailConfirmationCode = '';
+        this.emailChangeErrorMessage = '';
+      } catch (error) {
+        this.emailChangeErrorMessage = error.response?.data?.error;
+      }
+    },
+
+    async resendEmailChangeConfirmationCodes() {
+      try {
+        await authronomBackendAuthAxiosInstance.put('/user/change-email/start', {
+          newEmail: this.newEmail
+        });
+        this.emailChangeErrorMessage = '';
+      } catch (error) {
+        this.emailChangeErrorMessage = error.response?.data?.error;
       }
     },
 
     async startChangePassword() {
       try {
-        await authronomBackendAuthAxiosInstance.put('/change-password/start');
+        await authronomBackendAuthAxiosInstance.put('/user/change-password/start');
         this.passwordStep = 2;
-        this.errorMessage = '';
+        this.passwordChangeErrorMessage = '';
       } catch (error) {
-        this.errorMessage = error.response?.data?.error;
+        this.passwordChangeErrorMessage = error.response?.data?.error;
       }
     },
 
     async finalizeChangePassword() {
       try {
-        await authronomBackendAuthAxiosInstance.put('/change-password/finalize', {
+        await authronomBackendAuthAxiosInstance.put('/user/change-password/finalize', {
           confirmationCode: this.confirmationCode,
           newPassword: this.newPassword,
         });
         this.passwordStep = 1;
         this.confirmationCode = '';
         this.newPassword = '';
-        this.errorMessage = '';
+        this.passwordChangeErrorMessage = '';
       } catch (error) {
-        this.errorMessage = error.response?.data?.error;
+        this.passwordChangeErrorMessage = error.response?.data?.error;
       }
     },
 
     async resendConfirmationCode() {
       try {
-        await authronomBackendAuthAxiosInstance.put('/change-password/start');
-        this.errorMessage = '';
+        await authronomBackendAuthAxiosInstance.put('/user/change-password/start');
+        this.passwordChangeErrorMessage = '';
       } catch (error) {
-        this.errorMessage = error.response?.data?.error;
+        this.passwordChangeErrorMessage = error.response?.data?.error;
       }
     },
 
@@ -170,7 +275,7 @@ export default {
       this.passwordStep = 1;
       this.confirmationCode = '';
       this.newPassword = '';
-      this.errorMessage = '';
+      this.passwordChangeErrorMessage = '';
     }
   }
 };
@@ -200,14 +305,15 @@ export default {
   margin-bottom: 1rem;
 }
 
-.email-display {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+.current-email {
+  font-size: 1.1rem;
+  padding: 0.5rem 0;
 }
 
-.email-display span {
-  font-size: 1.1rem;
+.email-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .email-edit-form {
@@ -231,5 +337,11 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.resend-buttons {
+  margin-top: 1rem;
+  border-top: 1px solid #ddd;
+  padding-top: 1rem;
 }
 </style>

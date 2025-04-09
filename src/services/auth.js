@@ -57,31 +57,21 @@ export const useAuthStore = defineStore('auth', {
             }
         },
         async finalizeRegistrationWithEmail(email, confirmationCode, password) {
-            try {
-                await authronomBackendPublicAxiosInstance.post(`/registration/finalize`, {
-                    email,
-                    confirmationCode,
-                    password
-                });
-            } catch (e) {
-                const error = e.response?.data?.error || "Internal Server Error, please try again later.";
-                throw {message: error};
-            }
+            await authronomBackendPublicAxiosInstance.post(`/registration/finalize`, {
+                email,
+                confirmationCode,
+                password
+            });
         },
         async loginWithEmailPassword(email, password) {
-            try {
-                const formData = new FormData();
-                formData.append('email', email);
-                formData.append('password', password);
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
 
-                await authronomBackendPublicAxiosInstance.post(`/login`, formData, {
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    withCredentials: true // Ensures cookies (like JSESSIONID) are sent and received
-                });
-            } catch (e) {
-                const error = e.response?.data?.error || "Internal Server Error, please try again later.";
-                throw {message: error};
-            }
+            await authronomBackendPublicAxiosInstance.post(`/login`, formData, {
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                withCredentials: true // Ensures cookies (like JSESSIONID) are sent and received
+            });
         },
         loginWithGoogle() {
             window.location.href = `${config.authServer}/oauth2/authorization/google`;
